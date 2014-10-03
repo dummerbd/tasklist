@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Task List</title>
+    <link rel="stylesheet" type="text/css" href="styles/tasks.css" media="screen"/>
+    <!--[if lt IE 9]>
+    <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+    <script src="http://ajax.microsoft.com/ajax/jquery.templates/beta1/jquery.tmpl.js"></script>
+    <script src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.12.0/jquery.validate.js"></script>
+    <script src="scripts/jquery-serialization.js"></script>
+    <script src="scripts/indexeddb.js"></script>
+    <script src="scripts/webstorage.js"></script>
+    <script src="scripts/tasks-controller.js"></script>
+  </head>
+  <body>
+    <header>
+      <span>Task List</span>
+    </header>
+    <main id="taskPage">
+      <section id="taskCreation" class="not">
+        <form id="taskForm">
+          <input type="hidden" name="id" />
+          <div>
+            <label>Task</label>
+            <input type="text" required="required" name="task" class="large"
+              placeholder="Lunch with Bill Nye" maxlength="200" />
+          </div>
+          <div>
+            <label>Required By</label>
+            <input type="date" required="required" name="requiredBy" />
+          </div>
+          <div>
+            <label>Category</label>
+            <select name="category">
+              <option value="Personal">Personal</option>
+              <option value="Work">Work</option>
+            </select>
+          </div>
+          <nav>
+            <a href="#" id="saveTask">Save Task</a>
+            <a href="#" id="clearTask">Clear Task</a>
+          </nav>
+        </form>
+      </section>
+      <section>
+        <table id="tblTasks">
+          <colgroup>
+            <col width="40%">
+            <col width="15%">
+            <col width="15%">
+            <col width="30%">
+          </colgroup>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Due</th>
+              <th>Category</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+          </tbody>
+        </table>
+        <nav>
+          <a href="#" id="btnAddTask">Add Task</a>
+        </nav>
+      </section>
+    </main>
+    <footer>
+      <span>You have 0 tasks</span>
+    </footer>
+  </body>
+
+  <script>
+  var scriptLoaded = function(script, textStatus) {
+    $(document).ready(function() {
+      tasksController.init($('#taskPage'), function() {
+        tasksController.loadTasks();
+      });
+    });
+  }
+  var scriptLoadFailed = function(jqxhr, settings, exception) {
+    console.log('Failed to load web storage script');
+  }
+  if (window.storageEngine) {
+    scriptLoaded(null, null);
+  } else if (window.indexedDB) {
+    $.getScript('scripts/indexeddb.js').done(scriptLoaded).fail(scriptLoadFailed);
+  } else if (window.localStorage) {
+    $.getScript('scripts/webstorage.js').done(scriptLoaded).fail(scriptLoadFailed);
+  }
+  </script>
+
+  <script id="taskRow" type="text/x-jQuery-tmpl">
+  <tr>
+    <td class="taskName" data-task-id="${id}">${task}</td>
+    <td><time datetime="${requiredBy}">${requiredBy}</time></td>
+    <td>${category}</td>
+    <td>
+      <nav>
+        <a href="#" class="editRow">Edit</a>
+        <a href="#">Complete</a>
+        <a href="#" class="deleteRow">Delete</a>
+      </nav>
+    </td>
+  </tr>
+  </script>
+</html>
